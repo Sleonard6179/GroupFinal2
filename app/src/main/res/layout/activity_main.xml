@@ -1,0 +1,121 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity">
+
+
+
+    <TextView
+
+        android:id="@+id/mLongitudeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/longitude_label"
+        android:layout_toEndOf="@+id/longitude_label" />
+
+    <TextView
+
+        android:id="@+id/mLatitudeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/latitude_label" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/latitude_label"
+        android:id="@+id/latitude_label"
+        android:layout_alignParentStart="true"
+        android:layout_above="@+id/myText" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/longitude_label"
+        android:id="@+id/longitude_label"
+        android:layout_below="@+id/mLatitudeText"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/myText"
+        android:layout_below="@+id/mLatitudeText"
+        android:layout_toStartOf="@+id/longitude_label"
+        android:layout_marginTop="32dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="HIDE"
+        android:id="@+id/hideButton"
+        android:onClick="Hide"
+        android:layout_marginBottom="39dp"
+        android:layout_above="@+id/lastWinButton"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SEEK"
+        android:id="@+id/seekButton"
+        android:onClick="Seek"
+        android:layout_above="@+id/hideButton"
+        android:layout_alignStart="@+id/hideButton" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:id="@+id/textView2"
+        android:layout_below="@+id/myText"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="64dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:id="@+id/textView3"
+        android:layout_below="@+id/textView2"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="32dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:id="@+id/textView4"
+        android:layout_alignBottom="@+id/textView"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/OKbutton"
+        android:onClick="OKbutton"
+        android:id="@+id/OKbutton"
+        android:layout_alignBottom="@+id/textView"
+        android:layout_alignParentEnd="true" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Check Last Winner"
+        android:id="@+id/lastWinButton"
+        android:onClick="lastWinner"
+        android:layout_above="@+id/OKbutton"
+        android:layout_centerHorizontal="true" />
+
+</RelativeLayout>

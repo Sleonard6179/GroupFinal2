@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Hide and Seek</string>
+    <string name="action_settings">Settings</string>
+    <string name="SEEK">SEEK</string>
+    <string name="no_location_detected">No Location</string>
+    <string name="longitude_label">Longitude: </string>
+    <string name="latitude_label">Latitude: </string>
+    <string name="HIDE">HIDE</string>
+    <string name="OKbutton">OK</string>
+</resources>
