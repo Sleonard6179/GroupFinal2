@@ -6,5 +6,5 @@
     <string name="longitude_label">Longitude: </string>
     <string name="latitude_label">Latitude: </string>
     <string name="HIDE">HIDE</string>
-    <string name="OKbutton">OK</string>
+    <string name="OKbutton">Start Game</string>
 </resources>

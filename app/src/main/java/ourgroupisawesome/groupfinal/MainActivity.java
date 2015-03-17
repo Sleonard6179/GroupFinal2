@@ -32,6 +32,7 @@ import org.w3c.dom.Text;
 
 import java.net.UnknownHostException;
 import java.sql.Time;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -49,6 +50,7 @@ public class MainActivity extends Activity
     public String pName4;
     public TextView Gstatus;
     public String Answer;
+    public String HideTime;
     public double distance;
     public String HideLat;
     public String HideLon;
@@ -57,21 +59,17 @@ public class MainActivity extends Activity
     public String prevSeek;
     public String playerName;
     public static double distanceHotCold;
-    public String texttt;
-    public Button hideButton;
-    public Button seekButton;
-    public Button OKButton;
+    public String timeH;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Button Seekbtn = (Button) findViewById(R.id.seekButton);
-        Seekbtn.setEnabled(false);
+        Seekbtn.setEnabled(true);
         Button Hidebtn = (Button) findViewById(R.id.hideButton);
-        Hidebtn.setEnabled(false);
-        Button OKbtn = (Button) findViewById(R.id.OKbutton);
-        OKbtn.setEnabled(true);
+        Hidebtn.setEnabled(true);
         mLatitudeText = (TextView) findViewById((R.id.mLatitudeText));
         mLongitudeText = (TextView) findViewById((R.id.mLongitudeText));
         textView = (TextView) findViewById(R.id.textView3);
@@ -80,7 +78,6 @@ public class MainActivity extends Activity
         pName4 = String.valueOf(pName3);
         Gstatus = (TextView) findViewById(R.id.textView2);
         buildGoogleApiClient();
-
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
         alert.setTitle("   Welcome to: " +
                 " \n !...The Game...!");
@@ -93,22 +90,11 @@ public class MainActivity extends Activity
                 Editable pName = input.getText();
                 playerName = String.valueOf(pName);
                 Checkstatus checkstatus = new Checkstatus();
-                checkstatus.execute();
-            }
-
-        });
+                checkstatus.execute();}});
         alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 Checkstatus checkstatus = new Checkstatus();
-                checkstatus.execute();
-            }
-        });
-        alert.show();
-    }
-
-    public void Seek(View view) {
-        checkDistance checkDistance = new checkDistance();
-        checkDistance.execute();    }
+                checkstatus.execute();}});alert.show(); }
 
     public class Checkstatus extends AsyncTask<Void, Void, String> {
         public String doInBackground(Void... voids) {
@@ -117,20 +103,14 @@ public class MainActivity extends Activity
                 MongoClient client = new MongoClient(uri);
                 DB db = client.getDB(uri.getDatabase());
                 DBCollection HideAndSeek = db.getCollection("HideAndSeek");
-                /*List<DBObject> myList = null;*/
-                /*DBObject results = user.findOne("dbHideLat");*/
                 long nll = HideAndSeek.count();
-                /*myList = results.toArray();*/
                 if (nll != 0) {
                     client.close();
                     return "Go Seek";
-                } else {
-                    /*WhoWon checkuser = new WhoWon();
-                    checkuser.execute();*/
-
-                    /*finish();*/
+                } else if (nll == 0) {
+                    return "Winner";
+                } else
                    return "Go Hide";
-                }
 
             } catch (UnknownHostException e) {
                 return "it didn't work";
@@ -142,27 +122,6 @@ public class MainActivity extends Activity
         }
     }
 
-    public class WhoWon extends AsyncTask<Void, Text, String> {
-        public String doInBackground(Void...voids ) {
-            try {
-                MongoClientURI uri = new MongoClientURI("mongodb://TGIS504GroupProj:h!d3andseek@ds039010.mongolab.com:39010/tgis504");
-                MongoClient client = new MongoClient(uri);
-                DB db = client.getDB(uri.getDatabase());
-                DBCollection HideAndSeek = db.getCollection("HideAndSeek");
-                DBCursor winner = HideAndSeek.find().sort(new BasicDBObject("$natural",-1));
-                Answer = String.valueOf(winner.one().get("lastwinner"));
-                client.close();
-                if (Answer != null){
-                    return  String.valueOf(Answer) + " Won the last game. Hurry and Try to Hide";}
-                else {
-                    return "No winner's yet";}
-            } catch (UnknownHostException e) {
-                return "it didn't work";}}
-        @Override
-        protected void onPostExecute(String result) {
-            textView.setText(result);}
-    }
-
     public class LastWinner extends AsyncTask<Void, Text, String> {
         public String doInBackground(Void...voids ) {
             try {
@@ -170,12 +129,13 @@ public class MainActivity extends Activity
                 MongoClient client = new MongoClient(uri);
                 DB db = client.getDB(uri.getDatabase());
                 DBCollection HideAndSeek = db.getCollection("Winners");
-                long sss = HideAndSeek.count();
                 DBCursor winner = HideAndSeek.find().sort(new BasicDBObject("$natural",-1));
                 Answer = String.valueOf(winner.one().get("lastwinner"));
-                client.close();
-                if (sss <= 1 ) {
-                    return String.valueOf(Answer) + " Won the last game. Hurry and Try to Hide";
+                HideTime = String.valueOf(winner.one().get("hidetime"));
+                long HaS = HideAndSeek.count();
+                if (HaS != 0 ) {
+                    client.close();
+                    return String.valueOf(Answer) + " Won the last game on " + HideTime + " Hurry and Try to Hide!";
                 } else {
                     return "No winners yet";
                 }
@@ -183,24 +143,24 @@ public class MainActivity extends Activity
                 return "it didn't work";}}
         @Override
         protected void onPostExecute(String result) {
-            textView.setText(result);}
-    }
+            textView.setText(result);}}
+
+    public void Seek(View view) {
+        Button Hidebtn = (Button) findViewById(R.id.hideButton);
+        Hidebtn.setEnabled(false);
+        checkDistance checkDistance = new checkDistance();
+        checkDistance.execute();}
+
 
     public void Hide(View view) {
         Button Hidebtn = (Button) findViewById(R.id.hideButton);
         Hidebtn.setEnabled(false);
         Button Seekbtn = (Button) findViewById(R.id.seekButton);
         Seekbtn.setEnabled(true);
+        Checkstatus checkstatus = new Checkstatus();
+        checkstatus.execute();
         PostLocation postlocation = new PostLocation();
         postlocation.execute();
-    }
-    public void OKbutton(View view) {
-        Button OKbtn = (Button) findViewById(R.id.OKbutton);
-        OKbtn.setEnabled(false);
-        Button Hidebtn = (Button) findViewById(R.id.hideButton);
-        Hidebtn.setEnabled(true);
-        Button Seekbtn = (Button) findViewById(R.id.seekButton);
-        Seekbtn.setEnabled(true);
     }
 
     public void lastWinner (View view) {
@@ -215,7 +175,6 @@ public class MainActivity extends Activity
                 MongoClient client = new MongoClient(uri);
                 DB db = client.getDB(uri.getDatabase());
                 DBCollection HideAndSeek = db.getCollection("HideAndSeek");
-                DBCursor winner1 = HideAndSeek.find().sort(new BasicDBObject("$natural", -1));
                 long mll = HideAndSeek.count();
 
                 //Check if game is on
@@ -250,7 +209,8 @@ public class MainActivity extends Activity
                         DBCollection Winners = db.getCollection("Winners");
 
                         //build and insert Winner entry
-                        DBObject winner = new BasicDBObject("lastwinner", String.valueOf(playerName));
+                        DBObject winner = new BasicDBObject("lastwinner", String.valueOf(playerName))
+                                .append("hidetime", timeH);
                         Winners.insert(winner);
 
                         //close client
@@ -327,9 +287,13 @@ public class MainActivity extends Activity
                     myCurrentLocation.setLongitude(mLastLocation.getLongitude());
 
                     distanceHotCold = lastSeekLocation.distanceTo(myCurrentLocation);
+                    int dhcfeet = (int)Math.round(((distanceHotCold)*3.28));
+                    int dmainfeet = (int)Math.round(((distance)*3.28));
 
                     //build db Object for insertion
                     BasicDBObject newSeek = new BasicDBObject("name", playerName)
+                            .append("distanceHotCold", Double.valueOf(distanceHotCold))
+                            .append("distance", Double.valueOf(distance))
                             .append("dbSeekLat", Double.valueOf(mLastLocation.getLatitude()))
                             .append("dbSeekLong", Double.valueOf(mLastLocation.getLongitude()));
 
@@ -338,9 +302,10 @@ public class MainActivity extends Activity
 
                     //hotter/colder message
                     if (distanceHotCold < distance) {
-                        return "Good guess! You are closer than the last guess made by " + prevSeek + ".";
+                        return "Good guess! You are closer than the last guess made by " + prevSeek + ".\n" +
+                                "You were " + dhcfeet + " feet from last guessed location and " + dmainfeet + " feet away from hider!";
                     } else {
-                        return "Sorry, but you are further away than the last guess.";
+                        return "Sorry, but you are further away than the last guess by " + dhcfeet + " feet and "  + dmainfeet + " away from the hider!";
                     }
 
                 }
@@ -386,8 +351,8 @@ public class MainActivity extends Activity
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
         if (mLastLocation != null) {
-            mLatitudeText.setText(String.valueOf(mLastLocation.getLatitude()));
-            mLongitudeText.setText(String.valueOf(mLastLocation.getLongitude()));
+            mLatitudeText.setText(String.valueOf(" "  + mLastLocation.getLatitude()));
+            mLongitudeText.setText(String.valueOf(" " + mLastLocation.getLongitude()));
         } else {
             Toast.makeText(this, R.string.no_location_detected, Toast.LENGTH_LONG).show();
         }
@@ -428,32 +393,42 @@ public class MainActivity extends Activity
                 MongoClient client = new MongoClient(uri);
                 DB db = client.getDB(uri.getDatabase());
                 DBCollection HideAndSeek = db.getCollection("HideAndSeek");
-
-                /*SimpleDateFormat time = new SimpleDateFormat("HH:mm:ss MMM/dd/yyyy");
-                String now = time.format(new Date());*/
+                DBCursor hidecursor = HideAndSeek.find(new BasicDBObject());
+                long hidecurs = hidecursor.count();
                 SimpleDateFormat hideTime = new SimpleDateFormat(" EEE MMM dd ' at approximately ' hh:mm a ");
                 String timeH = hideTime.format(new Date());
 
+                {
                 if (mLastLocation != null) {
                     BasicDBObject LastLocation = new BasicDBObject();
                     LastLocation.put("dbHideLat", String.valueOf(mLastLocation.getLatitude()));
                     LastLocation.put("dbHideLong", String.valueOf(mLastLocation.getLongitude()));
                     LastLocation.put("Time", String.valueOf(timeH));
                     /*LastLocation.put("Time", String.valueOf(now));*/
-                    LastLocation.put("name", playerName);
 
-                    HideAndSeek.insert(LastLocation);
-                    client.close();
+                        if (hidecurs == 0) {
+                            LastLocation.put("name", playerName);
+                            HideAndSeek.insert(LastLocation);
+                            client.close();
+                            Checkstatus checkstatus = new Checkstatus();
+                            checkstatus.execute();
 
-                    return playerName + " just hid On " + LastLocation.put("Time", String.valueOf(timeH)) + "," +  "\n" + "Go find them! ";
+                            return playerName + " just hid On " + LastLocation.put("Time", String.valueOf(timeH)) + "," + "\n" + "Go find them! ";
 
+                        } else {
+                            client.close();
+                            Checkstatus checkstatus = new Checkstatus();
+                            checkstatus.execute();
+                            return "A game is already started. Go find them!";}
                 } else {
                     client.close();
                     return "You have no XY turn your location on Brah!";
-                }
+                }}
+
+
             } catch (UnknownHostException e) {
                 return "No body's home brah!";
-            }
+            }/*return null;*/
         }
 
         @Override

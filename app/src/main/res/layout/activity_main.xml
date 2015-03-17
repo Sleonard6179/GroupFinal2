@@ -60,9 +60,8 @@
         android:text="HIDE"
         android:id="@+id/hideButton"
         android:onClick="Hide"
-        android:layout_marginBottom="39dp"
         android:layout_above="@+id/lastWinButton"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignEnd="@+id/lastWinButton" />
 
     <Button
         android:layout_width="wrap_content"
@@ -70,43 +69,43 @@
         android:text="SEEK"
         android:id="@+id/seekButton"
         android:onClick="Seek"
-        android:layout_above="@+id/hideButton"
-        android:layout_alignStart="@+id/hideButton" />
+        android:layout_above="@+id/lastWinButton"
+        android:layout_alignStart="@+id/lastWinButton" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text=""
         android:id="@+id/textView2"
+        android:textSize="14dp"
+
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="47dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView3"
         android:layout_below="@+id/myText"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="64dp" />
+        android:layout_marginTop="10dp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text=""
-        android:id="@+id/textView3"
-        android:layout_below="@+id/textView2"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="32dp" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=""
         android:id="@+id/textView4"
-        android:layout_alignBottom="@+id/textView"
-        android:layout_alignParentStart="true" />
+        android:layout_below="@+id/textView3"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="9dp" />
 
-    <Button
+    <!--<Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/OKbutton"
         android:onClick="OKbutton"
         android:id="@+id/OKbutton"
-        android:layout_alignBottom="@+id/textView"
-        android:layout_alignParentEnd="true" />
+        android:layout_above="@+id/textView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="113dp" />-->
 
     <Button
         style="?android:attr/buttonStyleSmall"
@@ -115,7 +114,8 @@
         android:text="Check Last Winner"
         android:id="@+id/lastWinButton"
         android:onClick="lastWinner"
-        android:layout_above="@+id/OKbutton"
-        android:layout_centerHorizontal="true" />
+        android:layout_above="@+id/textView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="68dp" />
 
 </RelativeLayout>
