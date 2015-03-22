@@ -16,7 +16,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -27,12 +26,8 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
-
 import org.w3c.dom.Text;
-
 import java.net.UnknownHostException;
-import java.sql.Time;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -147,14 +142,14 @@ public class MainActivity extends Activity
 
     public void Seek(View view) {
         Button Hidebtn = (Button) findViewById(R.id.hideButton);
-        Hidebtn.setEnabled(false);
+        Hidebtn.setEnabled(true);
         checkDistance checkDistance = new checkDistance();
         checkDistance.execute();}
 
 
     public void Hide(View view) {
         Button Hidebtn = (Button) findViewById(R.id.hideButton);
-        Hidebtn.setEnabled(false);
+        Hidebtn.setEnabled(true);
         Button Seekbtn = (Button) findViewById(R.id.seekButton);
         Seekbtn.setEnabled(true);
         Checkstatus checkstatus = new Checkstatus();
@@ -171,149 +166,151 @@ public class MainActivity extends Activity
     private class checkDistance extends AsyncTask<Void, Void, String> {
         protected String doInBackground(Void... voids) {
             try {
-                MongoClientURI uri = new MongoClientURI("mongodb://TGIS504GroupProj:h!d3andseek@ds039010.mongolab.com:39010/tgis504");
-                MongoClient client = new MongoClient(uri);
-                DB db = client.getDB(uri.getDatabase());
-                DBCollection HideAndSeek = db.getCollection("HideAndSeek");
-                long mll = HideAndSeek.count();
+                if (mLastLocation != null) {
+                    MongoClientURI uri = new MongoClientURI("mongodb://TGIS504GroupProj:h!d3andseek@ds039010.mongolab.com:39010/tgis504");
+                    MongoClient client = new MongoClient(uri);
+                    DB db = client.getDB(uri.getDatabase());
+                    DBCollection HideAndSeek = db.getCollection("HideAndSeek");
+                    SimpleDateFormat hideTime = new SimpleDateFormat(" EEE MMM dd ' at approximately ' hh:mm a ");
+                    String timeH = hideTime.format(new Date());
+                    long mll = HideAndSeek.count();
 
-                //Check if game is on
-                if (mll == 0) {
+                    //Check if game is on
+                    if (mll == 0) {
 
-                    // Message if there is no hider
-                    return "It's a new game! Hurry up and hide!";
+                        // Message if there is no hider
+                        return "It's a new game! Hurry up and hide!";
 
-                }
+                    } else if (mll == 1) {
 
-                else if ( mll == 1) {
-
-                    //get hiding lat/long and assign variables
-                    DBObject hideentry = HideAndSeek.findOne();
-                    HideLat = String.valueOf(hideentry.get("dbHideLat"));
-                    HideLon = String.valueOf(hideentry.get("dbHideLong"));
+                        //get hiding lat/long and assign variables
+                        DBObject hideentry = HideAndSeek.findOne();
+                        HideLat = String.valueOf(hideentry.get("dbHideLat"));
+                        HideLon = String.valueOf(hideentry.get("dbHideLong"));
 
 
-                    Location hideloc = new Location(" ");
-                    hideloc.setLatitude(Double.valueOf(HideLat));
-                    hideloc.setLongitude(Double.valueOf(HideLon));
+                        Location hideloc = new Location(" ");
+                        hideloc.setLatitude(Double.valueOf(HideLat));
+                        hideloc.setLongitude(Double.valueOf(HideLon));
 
-                    //test distance for winning
-                    distance = hideloc.distanceTo(mLastLocation);
-                    //greater than 25 ft; using 7.62 because distanceTo() returns in meters
-                    if (distance <= 7.62) {
-                        /////clear entries for database
+                        //test distance for winning
+                        distance = hideloc.distanceTo(mLastLocation);
+                        //greater than 25 ft; using 7.62 because distanceTo() returns in meters
+                        if (distance <= 7.62) {
+                            /////clear entries for database
 
-                        HideAndSeek.remove(new BasicDBObject());
+                            HideAndSeek.remove(new BasicDBObject());
 
-                        //open Winners collection
-                        DBCollection Winners = db.getCollection("Winners");
+                            //open Winners collection
+                            DBCollection Winners = db.getCollection("Winners");
 
-                        //build and insert Winner entry
-                        DBObject winner = new BasicDBObject("lastwinner", String.valueOf(playerName))
-                                .append("hidetime", timeH);
-                        Winners.insert(winner);
+                            //build and insert Winner entry
+                            DBObject winner = new BasicDBObject("lastwinner", String.valueOf(playerName))
+                                    .append("hidetime", timeH);
+                            Winners.insert(winner);
 
-                        //close client
-                        client.close();
+                            //close client
+                            client.close();
 
-                        //Winning Message
-                        return "You've won! Hurry up and hide before someone else!";
+                            //Winning Message
+                            return "You've won! Hurry up and hide before someone else!";
+                        } else {
+
+                            //insert first guess
+                            BasicDBObject newSeek = new BasicDBObject("name", String.valueOf(playerName))
+                                    .append("dbSeekLat", Double.valueOf(mLastLocation.getLatitude()))
+                                    .append("dbSeekLong", Double.valueOf(mLastLocation.getLongitude()));
+
+                            HideAndSeek.insert(newSeek);
+                            client.close();
+                            return "You have guessed first so we can't tell if you are colder or hotter.";
+                        }
                     } else {
 
-                        //insert first guess
-                        BasicDBObject newSeek = new BasicDBObject("name", String.valueOf(playerName))
+                        //get hiding lat/long and assign variables
+                        DBObject hideentry = HideAndSeek.findOne();
+                        HideLat = String.valueOf(hideentry.get("dbHideLat"));
+                        HideLon = String.valueOf(hideentry.get("dbHideLong"));
+
+
+                        Location hideloc = new Location(" ");
+                        hideloc.setLatitude(Double.valueOf(HideLat));
+                        hideloc.setLongitude(Double.valueOf(HideLon));
+
+                        //test distance for winning
+                        distance = hideloc.distanceTo(mLastLocation);
+                        //greater than 25 ft; using 7.62 because distanceTo() returns in meters
+                        if (distance <= 7.62) {
+                            /////clear entries for database
+
+                            HideAndSeek.remove(new BasicDBObject());
+
+                            //open Winners collection
+                            DBCollection Winners = db.getCollection("Winners");
+
+                            //build and insert Winner entry
+                            DBObject winner = new BasicDBObject("lastwinner", String.valueOf(playerName));
+                            Winners.insert(winner);
+
+                            //close client
+                            client.close();
+
+                            //Winning Message
+                            return "You've won! Hurry up and hide before someone else!";
+                        } else {
+                            //set cursor at latest entry
+                            DBCursor cursor = HideAndSeek.find().skip((int) mll - 1);
+                       /* DBCursor cursor = HideAndSeek.find().sort(new BasicDBObject("$natural", -1));*/
+                            DBObject entry = cursor.next();
+                        /*DBObject entry = cursor.one();*/
+
+                            SeekLat = String.valueOf(entry.get("dbSeekLat"));
+                            SeekLon = String.valueOf(entry.get("dbSeekLong"));
+                            prevSeek = String.valueOf(entry.get("name"));
+                        }
+
+                        if (prevSeek.equals(playerName)) {
+                            prevSeek = "you";
+                        }
+
+                        Location lastSeekLocation = new Location(" ");
+                        lastSeekLocation.setLatitude(Double.valueOf(SeekLat));
+                        lastSeekLocation.setLongitude(Double.valueOf(SeekLon));
+
+                        Location myCurrentLocation = new Location("start");
+                        myCurrentLocation.setLatitude(mLastLocation.getLatitude());
+                        myCurrentLocation.setLongitude(mLastLocation.getLongitude());
+
+                        distanceHotCold = lastSeekLocation.distanceTo(myCurrentLocation);
+                        int dhcfeet = (int) Math.round(((distanceHotCold) * 3.28));
+                        int dmainfeet = (int) Math.round(((distance) * 3.28));
+
+                        //build db Object for insertion
+                        BasicDBObject newSeek = new BasicDBObject("name", playerName)
+                                .append("distanceHotCold", Double.valueOf(distanceHotCold))
+                                .append("distance", Double.valueOf(distance))
                                 .append("dbSeekLat", Double.valueOf(mLastLocation.getLatitude()))
                                 .append("dbSeekLong", Double.valueOf(mLastLocation.getLongitude()));
 
                         HideAndSeek.insert(newSeek);
                         client.close();
-                        return "You have guessed first so we can't tell if you are colder or hotter.";
+
+                        //hotter/colder message
+                        if (distanceHotCold < distance) {
+                            return "Good guess! You are closer than the last guess made by " + prevSeek + ".\n" +
+                                    "You were " + dhcfeet + " feet from last guessed location and " + dmainfeet + " feet away from hider!";
+                        } else {
+                            return "Sorry, but you are further away than the last guess by " + dhcfeet + " feet and " + dmainfeet + " away from the hider!";
+                        }
+
                     }
-                }
-
-                else {
-
-                    //get hiding lat/long and assign variables
-                    DBObject hideentry = HideAndSeek.findOne();
-                    HideLat = String.valueOf(hideentry.get("dbHideLat"));
-                    HideLon = String.valueOf(hideentry.get("dbHideLong"));
-
-
-                    Location hideloc = new Location(" ");
-                    hideloc.setLatitude(Double.valueOf(HideLat));
-                    hideloc.setLongitude(Double.valueOf(HideLon));
-
-                    //test distance for winning
-                    distance = hideloc.distanceTo(mLastLocation);
-                    //greater than 25 ft; using 7.62 because distanceTo() returns in meters
-                    if (distance <= 7.62) {
-                        /////clear entries for database
-
-                        HideAndSeek.remove(new BasicDBObject());
-
-                        //open Winners collection
-                        DBCollection Winners = db.getCollection("Winners");
-
-                        //build and insert Winner entry
-                        DBObject winner = new BasicDBObject("lastwinner", String.valueOf(playerName));
-                        Winners.insert(winner);
-
-                        //close client
-                        client.close();
-
-                        //Winning Message
-                        return "You've won! Hurry up and hide before someone else!";
-                    } else {
-                        //set cursor at latest entry
-                        DBCursor cursor = HideAndSeek.find().skip((int) mll - 1);
-                       /* DBCursor cursor = HideAndSeek.find().sort(new BasicDBObject("$natural", -1));*/
-                        DBObject entry = cursor.next();
-                        /*DBObject entry = cursor.one();*/
-
-                        SeekLat = String.valueOf(entry.get("dbSeekLat"));
-                        SeekLon = String.valueOf(entry.get("dbSeekLong"));
-                        prevSeek = String.valueOf(entry.get("name"));}
-
-                    if (prevSeek.equals(playerName)) {
-                        prevSeek = "you" ;
-                    }
-
-                    Location lastSeekLocation = new Location(" ");
-                    lastSeekLocation.setLatitude(Double.valueOf(SeekLat));
-                    lastSeekLocation.setLongitude(Double.valueOf(SeekLon));
-
-                    Location myCurrentLocation = new Location("start");
-                    myCurrentLocation.setLatitude(mLastLocation.getLatitude());
-                    myCurrentLocation.setLongitude(mLastLocation.getLongitude());
-
-                    distanceHotCold = lastSeekLocation.distanceTo(myCurrentLocation);
-                    int dhcfeet = (int)Math.round(((distanceHotCold)*3.28));
-                    int dmainfeet = (int)Math.round(((distance)*3.28));
-
-                    //build db Object for insertion
-                    BasicDBObject newSeek = new BasicDBObject("name", playerName)
-                            .append("distanceHotCold", Double.valueOf(distanceHotCold))
-                            .append("distance", Double.valueOf(distance))
-                            .append("dbSeekLat", Double.valueOf(mLastLocation.getLatitude()))
-                            .append("dbSeekLong", Double.valueOf(mLastLocation.getLongitude()));
-
-                    HideAndSeek.insert(newSeek);
-                    client.close();
-
-                    //hotter/colder message
-                    if (distanceHotCold < distance) {
-                        return "Good guess! You are closer than the last guess made by " + prevSeek + ".\n" +
-                                "You were " + dhcfeet + " feet from last guessed location and " + dmainfeet + " feet away from hider!";
-                    } else {
-                        return "Sorry, but you are further away than the last guess by " + dhcfeet + " feet and "  + dmainfeet + " away from the hider!";
-                    }
-
-                }
+                } else
+                    return "Your location is turned off";
 
 
 
             } catch (UnknownHostException e) {
-                return "No body's home brah!";
+                return "Unknown Host Exception";
             }
 
         }
@@ -399,6 +396,7 @@ public class MainActivity extends Activity
                 String timeH = hideTime.format(new Date());
 
                 {
+
                 if (mLastLocation != null) {
                     BasicDBObject LastLocation = new BasicDBObject();
                     LastLocation.put("dbHideLat", String.valueOf(mLastLocation.getLatitude()));
@@ -422,12 +420,12 @@ public class MainActivity extends Activity
                             return "A game is already started. Go find them!";}
                 } else {
                     client.close();
-                    return "You have no XY turn your location on Brah!";
+                    return "You have your location turned off";
                 }}
 
 
             } catch (UnknownHostException e) {
-                return "No body's home brah!";
+                return "Unknown Host Exception";
             }/*return null;*/
         }
 
